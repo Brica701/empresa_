@@ -1,6 +1,7 @@
 package org.iesvdm;
 
 import jakarta.persistence.EntityManager;
+import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.iesvdm.repository.DepartamentoRepository;
 import org.iesvdm.modelo.Departamento;
 import org.iesvdm.repository.EmpleadoRepository;
@@ -53,11 +54,11 @@ class EmpresaTests {
     @Test
     void test1() {
 
-        var listEmp = empRepo.findAll();
-
+        var listEmp = empRepo.findAll()
+                .stream()
+                .map(e -> e.getDepartamento().getCodigo());
 
         listEmp.forEach(System.out::println);
-
 
     }
 
@@ -68,11 +69,12 @@ class EmpresaTests {
     @Test
     void test2() {
 
-        var listEmp = empRepo.findAll();
-
+        var listEmp = empRepo.findAll()
+                .stream()
+                .map(e -> e.getNombre() + " " + e.getApellido1() + " " + e.getApellido2())
+                .map(String::toUpperCase);
 
         listEmp.forEach(System.out::println);
-
 
     }
 
@@ -84,11 +86,12 @@ class EmpresaTests {
     @Test
     void test3() {
 
-        var listEmp = empRepo.findAll();
+        var listEmp = empRepo.findAll()
+                .stream()
+                .map(e -> e.getCodigo() + " " + e.getNif().substring(0, 8) + " " + e.getNif().substring(8));
 
 
-        listEmp.forEach(System.out::println);
-
+                listEmp.forEach(System.out::println);
 
     }
 
@@ -99,8 +102,9 @@ class EmpresaTests {
      */
     void test4() {
 
-        var listDep = depRepo.findAll();
-
+        var listDep = depRepo.findAll()
+                .stream()
+                .map(d -> d.getNombre() + " " + (d.getPresupuesto() - d.getGastos()));
 
         listDep.forEach(System.out::println);
 
@@ -111,8 +115,10 @@ class EmpresaTests {
      */
     void test5() {
 
-        var listDep = depRepo.findAll();
-
+        var listDep = depRepo.findAll()
+                .stream()
+                .sorted(Comparator.comparingDouble(d -> d.getPresupuesto() - d.getGastos()))
+                .map(d -> d.getNombre() + " " + (d.getPresupuesto() - d.getGastos()));
 
         listDep.forEach(System.out::println);
 
@@ -125,6 +131,7 @@ class EmpresaTests {
 
         var listDep = depRepo.findAll();
 
+        listDep.sort(comparing(Departamento::getPresupuesto).reversed());
 
         listDep.forEach(System.out::println);
 
@@ -137,6 +144,9 @@ class EmpresaTests {
 
         var listDep = depRepo.findAll();
 
+        listDep.stream()
+                .filter(d -> d.getPresupuesto() >= 100000 && d.getPresupuesto() <= 200000)
+                        .map(Departamento::getNombre);
 
         listDep.forEach(System.out::println);
 
@@ -150,6 +160,11 @@ class EmpresaTests {
 
         var listEmp = empRepo.findAll();
 
+        listEmp.stream()
+                .skip(2)
+                .sorted(comparing(Empleado::getCodigo))
+                .limit(5)
+                .map(Empleado::getNombre);
 
         listEmp.forEach(System.out::println);
 
@@ -164,6 +179,10 @@ class EmpresaTests {
 
         var listDep = depRepo.findAll();
 
+        listDep.stream().
+                filter(d -> d.getGastos() < 5000)
+                .sorted(comparingDouble(Departamento::getGastos).reversed())
+                .map(Departamento::getNombre);
 
         listDep.forEach(System.out::println);
 

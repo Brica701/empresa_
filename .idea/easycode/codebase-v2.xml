@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="com.obiscr.chatgpt.settings.EasyCodeState">
+    <option name="projectFiles" value="$PROJECT_DIR$/src/main/java/org/iesvdm/modelo/Departamento.java;/home/isaac/IdeaProjects/empresa_/src/main/java/org/iesvdm/modelo/Empleado.java;/home/isaac/IdeaProjects/empresa_/src/main/java/org/iesvdm/repository/DepartamentoRepository.java;/home/isaac/IdeaProjects/empresa_/src/main/java/org/iesvdm/repository/EmpleadoRepository.java;/home/isaac/IdeaProjects/empresa_/src/main/java/org/iesvdm/EmpresaApplication.java;/home/isaac/IdeaProjects/empresa_/src/main/java/org/iesvdm/Main.java;/home/isaac/IdeaProjects/empresa_/src/main/resources/data.sql;/home/isaac/IdeaProjects/empresa_/src/main/resources/schema.sql;/home/isaac/IdeaProjects/empresa_/src/test/java/org/iesvdm/EmpresaTests.java;/home/isaac/IdeaProjects/empresa_/pom.xml" />
+  </component>
+</project>
