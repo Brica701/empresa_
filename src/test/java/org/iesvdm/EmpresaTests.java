@@ -179,8 +179,8 @@ class EmpresaTests {
 
         var listDep = depRepo.findAll();
 
-        listDep.stream().
-                filter(d -> d.getGastos() < 5000)
+        listDep.stream()
+                .filter(d -> d.getGastos() < 5000)
                 .sorted(comparingDouble(Departamento::getGastos).reversed())
                 .map(Departamento::getNombre);
 
@@ -196,7 +196,9 @@ class EmpresaTests {
 
         var listEmp = empRepo.findAll();
 
-
+        listEmp.stream()
+                .filter(e -> e.getApellido2().equals("Díaz") || e.getApellido2().equals("Moreno"))
+                .map(Empleado::toString);
 
         listEmp.forEach(System.out::println);
 
@@ -211,7 +213,9 @@ class EmpresaTests {
 
         var listEmp = empRepo.findAll();
 
-
+        listEmp.stream()
+                .filter(e -> e.getDepartamento().getCodigo() == 2 || e.getDepartamento().getCodigo() == 4 || e.getDepartamento().getCodigo() == 5)
+                .map(Empleado::toString);
 
         listEmp.forEach(System.out::println);
 
@@ -227,7 +231,9 @@ class EmpresaTests {
 
         var listEmp = empRepo.findAll();
 
-
+        listEmp.stream().
+                filter(e -> e.getNif().equals("38382980M"))
+                .map(Empleado::getDepartamento);
 
         listEmp.forEach(System.out::println);
 
@@ -242,7 +248,9 @@ class EmpresaTests {
 
         var listEmp = empRepo.findAll();
 
-
+        listEmp.stream()
+                .filter(e -> e.getDepartamento().getPresupuesto() < 100000 || e.getDepartamento().getPresupuesto() > 200000)
+                .map(Empleado::toString);
 
         listEmp.forEach(System.out::println);
 
@@ -254,6 +262,9 @@ class EmpresaTests {
     void test14() {
 
         var listDep = depRepo.findAll();
+
+        listDep.stream()
+                .min(comparingDouble(Departamento::getPresupuesto));
 
 
         listDep.forEach(System.out::println);
@@ -270,6 +281,7 @@ class EmpresaTests {
         var listDep = depRepo.findAll();
 
 
+
         listDep.forEach(System.out::println);
 
      }
@@ -280,6 +292,7 @@ class EmpresaTests {
     void test16() {
 
         var listDep = depRepo.findAll();
+
 
 
         listDep.forEach(System.out::println);
@@ -331,7 +344,7 @@ class EmpresaTests {
         
         var listDep = depRepo.findAll();
 
-        //
+
 
         listDep.forEach(System.out::println);
 
