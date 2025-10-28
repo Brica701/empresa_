@@ -13,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static java.util.Comparator.*;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import static java.util.stream.Collectors.*;
 
 @SpringBootTest
@@ -53,10 +55,11 @@ class EmpresaTests {
      */
     @Test
     void test1() {
-
         var listEmp = empRepo.findAll()
                 .stream()
-                .map(e -> e.getDepartamento().getCodigo());
+                .filter(e -> e.getDepartamento() != null)
+                .map(e -> e.getDepartamento().getCodigo())
+                .distinct();
 
         listEmp.forEach(System.out::println);
 
@@ -100,6 +103,7 @@ class EmpresaTests {
      * Para calcular este dato tendrá que restar al valor del presupuesto inicial (columna presupuesto) los gastos que se han generado (columna gastos).
      *  Tenga en cuenta que en algunos casos pueden existir valores negativos.
      */
+    @Test
     void test4() {
 
         var listDep = depRepo.findAll()
@@ -127,11 +131,14 @@ class EmpresaTests {
     /**
      * 6. Devuelve una lista con el nombre y el presupuesto, de los 3 departamentos que tienen mayor presupuesto
      */
+    @Test
     void test6() {
 
-        var listDep = depRepo.findAll();
-
-        listDep.sort(comparing(Departamento::getPresupuesto).reversed());
+        var listDep = depRepo.findAll()
+                .stream()
+                .sorted(Comparator.comparingDouble(Departamento::getPresupuesto).reversed())
+                .limit(3)
+                .map(d -> d.getNombre() + " " + d.getPresupuesto());
 
         listDep.forEach(System.out::println);
 
@@ -181,7 +188,7 @@ class EmpresaTests {
 
         listDep.stream()
                 .filter(d -> d.getGastos() < 5000)
-                .sorted(comparingDouble(Departamento::getGastos).reversed())
+                .sorted(Comparator.comparingDouble(Departamento::getGastos).reversed())
                 .map(Departamento::getNombre);
 
         listDep.forEach(System.out::println);
@@ -193,12 +200,10 @@ class EmpresaTests {
      */
     @Test
     void test10() {
-
-        var listEmp = empRepo.findAll();
-
-        listEmp.stream()
-                .filter(e -> e.getApellido2().equals("Díaz") || e.getApellido2().equals("Moreno"))
-                .map(Empleado::toString);
+        var listEmp = empRepo.findAll()
+                .stream()
+                .filter(e -> "Díaz".equals(e.getApellido2()) || "Moreno".equals(e.getApellido2()))
+                .toList();
 
         listEmp.forEach(System.out::println);
 
@@ -264,7 +269,7 @@ class EmpresaTests {
         var listDep = depRepo.findAll();
 
         listDep.stream()
-                .min(comparingDouble(Departamento::getPresupuesto));
+                .min(Comparator.comparingDouble(Departamento::getPresupuesto));
 
 
         listDep.forEach(System.out::println);
@@ -276,77 +281,117 @@ class EmpresaTests {
      * Tienes que devolver dos columnas, una con el nombre del departamento 
      * y otra con el número de empleados que tiene asignados.
      */
+    @Test
     void test15() {
 
-        var listDep = depRepo.findAll();
+        var listEmp = empRepo.findAll();
+
+        var conteoPorDep = listEmp.stream()
+                .filter(e -> e.getDepartamento() != null)
+                .collect(Collectors.groupingBy(
+                        e -> e.getDepartamento().getCodigo(),
+                        Collectors.counting()
+                ));
+
+        conteoPorDep.forEach((codigoDep, cantidad) ->
+                System.out.println("Departamento " + codigoDep + ": " + cantidad + " empleados"));
+    }
 
 
-
-        listDep.forEach(System.out::println);
-
-     }
 
     /**
      * 16. Calcula el número total de empleados que trabajan en cada unos de los departamentos que tienen un presupuesto mayor a 200000 euros.
      */
+    @Test
     void test16() {
 
         var listDep = depRepo.findAll();
+        var conteoPorDep = listDep.stream()
+                .filter(d -> d.getPresupuesto() > 200000)
+                .collect(Collectors.groupingBy(
+                        d -> d.getNombre(),
+                        Collectors.counting()
+                ));
 
+        conteoPorDep.forEach((nombreDep, cantidad) ->
+                System.out.println("Departamento " + nombreDep + ": " + cantidad + " empleados"));
+    }
 
-
-        listDep.forEach(System.out::println);
-
-     }
 
     /**
      * 17. Calcula el nombre de los departamentos que tienen más de 2 empleados. 
      * El resultado debe tener dos columnas, una con el nombre del departamento y
      *  otra con el número de empleados que tiene asignados
      */
+    @Test
     void test17() {
 
-        var listDep = depRepo.findAll();
-
+        var listDep = depRepo.findAll()
+                .stream()
+                .filter(d -> d.getEmpleados() != null && d.getEmpleados().size() > 2)
+                .map(d -> String.format("%-20s | %d empleados", d.getNombre(), d.getEmpleados().size()))
+                .toList();
 
         listDep.forEach(System.out::println);
 
-     }
+    }
 
     /** 18. Lista todos los nombres de departamentos junto con los nombres y apellidos de los empleados. 
      *
      */
+    @Test
     void test18() {
 
-        var listDep = depRepo.findAll();
-
+        var listDep = depRepo.findAll()
+                .stream()
+                .map(d -> String.format("%-20s | %s",
+                        d.getNombre(),
+                        d.getEmpleados().stream()
+                                .map(e -> e.getNombre() + " " + e.getApellido1() +
+                                        (e.getApellido2() != null ? " " + e.getApellido2() : ""))
+                                .collect(Collectors.joining(", "))
+                ))
+                .toList();
 
         listDep.forEach(System.out::println);
 
-     }
+    }
 
     /**
      * 19. Devuelve la media de empleados que trabajan en los departamentos
      */
+    @Test
     void test19() {
 
         var listDep = depRepo.findAll();
+        var conteoPorDep = listDep.stream()
+                .filter(d -> d.getEmpleados() != null && d.getEmpleados().size() > 2)
+                .map(d -> d.getEmpleados().size())
+                .toList();
+        var media = conteoPorDep.stream()
+                .mapToInt(Integer::intValue)
+                .average()
+                .orElse(0.0);
 
+        System.out.println("Media de empleados por departamento: " + media);
 
-        listDep.forEach(System.out::println);
-
-   }
+    }
 
     /**
      * 20. Calcula el presupuesto máximo, mínimo  y número total de departamentos con un solo stream.
      */
+    @Test
     void test20() {
         
-        var listDep = depRepo.findAll();
+        var stats = depRepo.findAll()
+                .stream()
+                .mapToDouble(Departamento::getPresupuesto)
+                .summaryStatistics();
 
 
-
-        listDep.forEach(System.out::println);
+        System.out.println("Presupuesto máximo: " + stats.getMax());
+        System.out.println("Presupuesto mínimo: " + stats.getMin());
+        System.out.println("Número total de departamentos: " + stats.getCount());
 
     }
 
